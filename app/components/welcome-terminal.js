@@ -45,15 +45,15 @@ export default Ember.Component.extend({
   },
 
   append(str) {
-    let content = this.get('current.content');
-    content += str;
-    this.set('current.content', content);
+    let command = this.get('current.command');
+    command += str;
+    this.set('current.command', command);
   },
 
   del() {
-    let content = this.get('current.content');
-    content = content.substr(0, content.length - 1);
-    this.set('current.content', content);
+    let command = this.get('current.command');
+    command = command.substr(0, command.length - 1);
+    this.set('current.command', command);
   },
 
   newline() {
@@ -63,5 +63,5 @@ export default Ember.Component.extend({
 
 const Line = Ember.Object.extend({
   prompt: '$ ',
-  content: ''
+  command: ''
 });

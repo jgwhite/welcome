@@ -1,0 +1,5 @@
+{{#each lines as |line|}}
+  <div class="line">
+    {{line.prompt}}{{line.command}}{{#if (eq line current)}}{{welcome-caret}}{{/if}}
+  </div>
+{{/each}}
