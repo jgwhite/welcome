@@ -1,0 +1,10 @@
+welcome-caret {
+  border-left: 1px solid black;
+  animation: blink .75s step-start infinite;
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
