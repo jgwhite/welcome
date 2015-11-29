@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import Line from 'welcome/models/line';
-import { reads } from 'ember-computed-decorators';
+import programs from 'welcome/programs/all';
+import { readOnly } from 'ember-computed-decorators';
 const { run } = Ember;
 const DELAY_BEFORE_BLINK = 250;
 
@@ -9,21 +10,24 @@ export default Ember.Component.extend({
 
   lines: null,
   shouldBlink: false,
+  path: '/home/ember',
 
   init() {
     this._super(...arguments);
     this.lines = [Line.create()];
   },
 
-  @reads('lines.lastObject')
+  @readOnly('lines.lastObject')
   current,
 
   didInsertElement() {
     this._keyDown = run.bind(this, 'keyDown');
     this._keyPress = run.bind(this, 'keyPress');
+
     window.addEventListener('keydown', this._keyDown);
     window.addEventListener('keypress', this._keyPress);
-    this._blink = run.later(this, 'startBlink', DELAY_BEFORE_BLINK);
+
+    this.scheduleStartBlink();
   },
 
   willDestroyElement() {
@@ -32,8 +36,6 @@ export default Ember.Component.extend({
   },
 
   keyDown(event) {
-    console.log(`keyDown: ${keySignature(event)}`);
-
     this.stopBlink();
 
     switch (keySignature(event)) {
@@ -45,16 +47,17 @@ export default Ember.Component.extend({
       case '40'      : this.down();    break;
       case 'ctrl+65' : this.start();   break;
       case 'ctrl+69' : this.end();     break;
+      case 'ctrl+76' : this.clear();   break;
       default        : return;
     }
 
     event.preventDefault();
+
+    this.scheduleScrollToCurrent();
   },
 
   keyPress(event) {
     event.preventDefault();
-
-    console.log(`keyPress: ${keySignature(event)}`);
 
     this.append(String.fromCharCode(event.which));
   },
@@ -75,28 +78,14 @@ export default Ember.Component.extend({
   evaluate() {
     let line = this.get('current');
     let command = line.get('command');
-    let [operator, ...operands] = command.split(' ');
+    let [name, ...args] = command.split(' ');
+    let program = programs[name];
 
-    switch (operator) {
-      case '':
-        break;
-      case 'echo':
-        line.set('result', operands.join(' '));
-        break;
-      case 'pwd':
-        line.set('result', '/home/ember');
-        break;
-      case 'ember':
-        line.set('result', [
-          'version: 1.13.13',
-          'node: 5.1.0',
-          'npm: 2.14.10',
-          'os: welcome-os'
-        ].join('\n'));
-        break;
-      default:
-        line.set('result', `${command}: command not found`);
-        break;
+    if (program) {
+      let result = program.call(this, ...args);
+      line.set('result', result);
+    } else if (name.length) {
+      line.set('result', `${name}: command not found`);
     }
   },
 
@@ -124,13 +113,32 @@ export default Ember.Component.extend({
 
   stopBlink() {
     this.set('shouldBlink', false);
+    this.scheduleStartBlink();
+  },
 
+  scheduleStartBlink() {
     run.cancel(this._blink);
     this._blink = run.later(this, 'startBlink', DELAY_BEFORE_BLINK);
   },
 
   startBlink() {
     this.set('shouldBlink', true);
+  },
+
+  scheduleScrollToCurrent() {
+    run.schedule('afterRender', this, 'scrollToCurrent');
+  },
+
+  clear() {
+    this.set('lines', [Line.create()]);
+  },
+
+  scrollToCurrent() {
+    let scrollTop = this.$().scrollTop();
+    let currentEl = this.$('> *:last');
+    let y = scrollTop + currentEl.offset().top;
+
+    this.$().scrollTop(y);
   }
 });
 

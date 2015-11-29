@@ -1,3 +1,8 @@
+html, body, body > .ember-view {
+  height: 100%;
+  margin: 0; padding: 0;
+}
+
 welcome-terminal {
   display: block;
   position: relative;
@@ -23,9 +28,9 @@ welcome-terminal-result {
 
 welcome-caret {
   position: absolute;
-  vertical-align: bottom;
   background: black;
-  height: 1em;
+  vertical-align: top;
+  height: 1.25em;
 }
 welcome-caret.blink {
   animation: blink .75s step-start infinite;
