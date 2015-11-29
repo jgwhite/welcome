@@ -1,5 +1,18 @@
 {{#each lines as |line|}}
-  <div class="line">
-    {{line.prompt}}{{line.command}}{{#if (eq line current)}}{{welcome-caret}}{{/if}}
-  </div>
+  <welcome-terminal-line>
+    <welcome-terminal-prompt>
+      {{~line.prompt~}}
+    </welcome-terminal-prompt><welcome-terminal-command>
+      {{~#if (eq line current)~}}
+        {{~line.pre}}{{welcome-caret blink=shouldBlink}}{{line.post~}}
+      {{~else~}}
+        {{~line.command~}}
+      {{~/if~}}
+    </welcome-terminal-command>
+    {{~#if line.result~}}
+      <welcome-terminal-result>
+        {{~line.result~}}
+      </welcome-terminal-result>
+    {{~/if~}}
+  </welcome-terminal-line>
 {{/each}}
