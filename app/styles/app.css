@@ -31,13 +31,14 @@ welcome-caret {
   background: black;
   vertical-align: top;
   height: 1.25em;
+  opacity: .5;
 }
 welcome-caret.blink {
   animation: blink .75s step-start infinite;
 }
 
 @keyframes blink {
-  0% { opacity: 1; }
+  0% { opacity: .5; }
   50% { opacity: 0; }
-  100% { opacity: 1; }
+  100% { opacity: .5; }
 }

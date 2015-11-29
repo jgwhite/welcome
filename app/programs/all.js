@@ -6,8 +6,24 @@ const programs = {
     return args.join(' ');
   },
 
+  ls() {
+    return Object.keys(this.cwd()).join('\n');
+  },
+
   pwd() {
     return this.path;
+  },
+
+  touch(path) {
+    this.cwd()[path] = '';
+  },
+
+  cat(path) {
+    return this.cwd()[path];
+  },
+
+  rm(path) {
+    delete this.cwd()[path];
   },
 
   which(name) {
@@ -22,7 +38,7 @@ const programs = {
     let program = ember[command];
 
     if (program) {
-      return program(...args);
+      return program.call(this, ...args);
     } else {
       return `The specified command ${command} is invalid. For available options, see \`ember help\`.`;
     }
@@ -75,6 +91,32 @@ const ember = {
   },
 
   new(name) {
+    this.cwd()[name] = {
+      app: {
+        'app.js': '',
+        'components': {},
+        'controllers': {},
+        'helpers': {},
+        'index.html': '',
+        'models': {},
+        'router.js': '',
+        'routes': {},
+        'styles': {
+          'app.css': ''
+        },
+        'templates': {
+          'application.hbs': '{{outlet}}',
+          'components': {}
+        }
+      },
+      'bower.json': '',
+      'config': {
+        'environment.js': ''
+      },
+      'ember-cli-build.js': '',
+      'package.json': ''
+    };
+
     return `version 1.13.13
   create .bowerrc
   create .editorconfig

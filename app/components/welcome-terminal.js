@@ -2,19 +2,25 @@ import Ember from 'ember';
 import Line from 'welcome/models/line';
 import programs from 'welcome/programs/all';
 import { readOnly } from 'ember-computed-decorators';
-const { run } = Ember;
+const { isEmpty, run } = Ember;
 const DELAY_BEFORE_BLINK = 250;
 
 export default Ember.Component.extend({
   tagName: 'welcome-terminal',
 
   lines: null,
+  filesystem: null,
   shouldBlink: false,
   path: '/home/ember',
 
   init() {
     this._super(...arguments);
     this.lines = [Line.create()];
+    this.filesystem = {
+      home: {
+        ember: {}
+      }
+    };
   },
 
   @readOnly('lines.lastObject')
@@ -139,6 +145,15 @@ export default Ember.Component.extend({
     let y = scrollTop + currentEl.offset().top;
 
     this.$().scrollTop(y);
+  },
+
+  cwd() {
+    let parts = this.path.split('/').reject(isEmpty);
+    let cwd = this.filesystem;
+
+    parts.forEach(p => cwd = cwd[p]);
+
+    return cwd;
   }
 });
 
